@@ -1,8 +1,18 @@
 <?php
 
+function get($arr, $key, $default) {
+	
+	if (!isset($arr[$key])) {
+		return $default;
+	}
+	
+	return $arr[$key];
+}
+
+$minutesToMonitor = intval(get($_GET, 'deltaMins', 60));
+$index = get($_GET, 'index', 'time-spent');
 
 $currentTime = time();
-$minutesToMonitor = 1;
 $delta = $minutesToMonitor*60;
 
 $data = array('query' => array(
@@ -14,7 +24,7 @@ $data = array('query' => array(
         )
 ));
 
-$url = 'http://localhost:9200/time-spent/_search';
+$url = "http://localhost:9200/$index/_search";
 
 //open connection
 

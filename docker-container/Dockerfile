@@ -14,6 +14,7 @@ RUN apt-get install -y --force-yes supervisor
 RUN mkdir -p /var/log/udp-server/ && mkdir -p /var/elasticdata
 RUN apt-get install -y --force-yes python-requests
 RUN apt-get install -y --force-yes git
+RUN apt-get install -y --force-yes php5-curl
 RUN currentDir=$(pwd)
 RUN cd /var && git clone https://github.com/caiomeriguetti/app-monitor.git ;
 RUN cp /var/app-monitor/apache2/dashboard.conf /etc/apache2/sites-available/dashboard.conf; a2ensite dashboard.conf
