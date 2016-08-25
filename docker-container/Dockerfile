@@ -11,9 +11,11 @@ RUN apt-get install -y --force-yes oracle-java8-set-default
 RUN curl -L -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.4/elasticsearch-2.3.4.tar.gz
 RUN tar -xvf elasticsearch-2.3.4.tar.gz
 RUN apt-get install -y --force-yes supervisor
-RUN mkdir -p /var/appmonitor/ && mkdir -p /var/log/udp-server/ && mkdir -p /var/elasticdata
+RUN mkdir -p /var/log/udp-server/ && mkdir -p /var/elasticdata
 RUN apt-get install -y --force-yes python-requests
-RUN cd /var && git clone git@github.com:caiomeriguetti/app-monitor.git
 RUN apt-get install -y --force-yes git
+RUN cd /var && git clone https://github.com/caiomeriguetti/app-monitor.git
+RUN cp /var/app-monitor/udp-server.supervisor.conf /etc/supervisor/conf.d/udp-server.conf
+COPY entrypoint.sh /var/entrypoint.sh
 EXPOSE 80 9200 10000
-ENTRYPOINT service apache2 start && service supervisor start && cd elasticsearch-2.3.4/bin && ./elasticsearch -Dpath.data=/var/elasticdata -Des.insecure.allow.root=true -Dnetwork.bind_host="0.0.0.0" > /tmp/elasticout
+ENTRYPOINT /bin/bash /var/entrypoint.sh && cd elasticsearch-2.3.4/bin ./elasticsearch -Dpath.data=/var/elasticdata -Des.insecure.allow.root=true -Dnetwork.bind_host="0.0.0.0" > /tmp/elasticout
