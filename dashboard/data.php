@@ -1,3 +1,5 @@
 <?php
 
-file_get_contents('http://localhost:9200//_search?q=*');
+$searchData = file_get_contents('http://localhost:9200/time-spent/_search?q=*&pretty');
+
+echo $searchData;
