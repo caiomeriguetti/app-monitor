@@ -14,9 +14,7 @@ sock.bind(server_address)
 
 def sendToElastic(jsonStr):
     data = json.loads(jsonStr)
-    index = (str(data['id']) + '.' + str(data['type'])).lower()
-    response = requests.post('http://localhost:9200/%s/log/' % (index,), data=jsonStr)
-	
+    response = requests.post('http://localhost:9200/%s/log/' % (data['type'],), data=jsonStr)
 
 while True:
     print >>sys.stderr, '\nwaiting to receive message'

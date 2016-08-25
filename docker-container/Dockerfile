@@ -14,8 +14,10 @@ RUN apt-get install -y --force-yes supervisor
 RUN mkdir -p /var/log/udp-server/ && mkdir -p /var/elasticdata
 RUN apt-get install -y --force-yes python-requests
 RUN apt-get install -y --force-yes git
-RUN cd /var && git clone https://github.com/caiomeriguetti/app-monitor.git
+RUN currentDir=$(pwd)
+RUN cd /var && git clone https://github.com/caiomeriguetti/app-monitor.git ;
+RUN cp /var/app-monitor/apache2/dashboard.conf /etc/apache2/sites-available/dashboard.conf; a2ensite dashboard.conf
 RUN cp /var/app-monitor/udp-server.supervisor.conf /etc/supervisor/conf.d/udp-server.conf
-COPY entrypoint.sh /var/entrypoint.sh
+RUN cd $currentDir
 EXPOSE 80 9200 10000
-ENTRYPOINT /bin/bash /var/entrypoint.sh && cd elasticsearch-2.3.4/bin ./elasticsearch -Dpath.data=/var/elasticdata -Des.insecure.allow.root=true -Dnetwork.bind_host="0.0.0.0" > /tmp/elasticout
+ENTRYPOINT currentDir=$(pwd); cd /var/app-monitor; git fetch --all; git checkout origin/master -f; cd $currentDir; service apache2 start; service supervisor start; cd elasticsearch-2.3.4/bin && ./elasticsearch -Dpath.data=/var/elasticdata -Des.insecure.allow.root=true -Dnetwork.bind_host="0.0.0.0" > /tmp/elasticout
