@@ -42,12 +42,6 @@
 					}
 					
 					byId[id].push(item._source);
-					
-					var date = new Date(item._source.timestamp*1000);
-					var hours = date.getHours();
-					var minutes = "0" + date.getMinutes();
-					var seconds = "0" + date.getSeconds();
-					var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 				});
 				
 				var id;
@@ -107,7 +101,7 @@
 				
 				var datasets = [];
 				var colorIndex = 0;
-				var legendColors = {}
+				var legendColors = {};
 				
 				for (var idToRender in aggregationsById) {
 					var aggregations = aggregationsById[idToRender];
@@ -117,7 +111,13 @@
 					var currentAggregation;
 					for (var i = 0; i < aggregations.length; i++) {
 						currentAggregation = aggregations[i];
-						labels.push(currentAggregation.startTime);
+						
+						var date = new Date(currentAggregation.startTime*1000);
+						var hours = date.getHours();
+						var minutes = "0" + date.getMinutes();
+						var seconds = "0" + date.getSeconds();
+						var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+						labels.push(formattedTimebyId);
 						values.push(currentAggregation.average);
 					}
 					
@@ -152,7 +152,7 @@
 			
 			function refresh () {
 				$.ajax({
-					url: 'data.php?deltaMins=3600',
+					url: 'data.php?deltaMins=3600&signalId=picpay-webservice.api.getActivityStream',
 					type: 'get',
 					success: function (data) {
 						currentData = $.parseJSON(data);
