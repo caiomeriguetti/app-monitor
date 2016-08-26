@@ -3,16 +3,62 @@
 		<title>Teste</title>
 		<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 		<script src="node_modules/chart.js/dist/Chart.min.js"></script>
-		<script id="mockdata">
-			{"took":2,"timed_out":false,"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":4,"max_score":1.0,"hits":[{"_index":"time-spent","_type":"log","_id":"AVbDcSGdHy03E8IXfeNA","_score":1.0,"_source":{"type": "time-spent", "value": 0.077982187271118, "id":"picpay-backend.core.Consumers.getActivities", "timestamp":1472157786}},{"_index":"time-spent","_type":"log","_id":"AVbDfs_2GWcZT1Ng0iWS","_score":1.0,"_source":{"type": "time-spent", "value": 0.077220916748047, "id":"picpay-backend.core.Consumers.getActivities", "timestamp":1472158683}},{"_index":"time-spent","_type":"log","_id":"AVbDcSG8Hy03E8IXfeNB","_score":1.0,"_source":{"type": "time-spent", "value": 0.27781295776367, "id":"picpay-webservice.api.getActivityStream", "timestamp":1472157786}},{"_index":"time-spent","_type":"log","_id":"AVbDftAQGWcZT1Ng0iWT","_score":1.0,"_source":{"type": "time-spent", "value": 0.25736594200134, "id":"picpay-webservice.api.getActivityStream", "timestamp":1472158683}}]}}
-		</script>
 	</head>
 	
 	<body>
 		<canvas id="myChart" width="1000" height="1000" style="display: block; width: 1000px; height: 1000px;"></canvas>
 		<script>
+		var currentData = null;
+		function compare(a,b) {
+		  if (a.timestamp < b.timestamp)
+		    return -1;
+		  if (a.timestamp > b.timestamp)
+		    return 1;
+		  return 0;
+		}
+
+		function redrawChart () {
+			var value, id;
+			var byId = {};
+			$(currentData.hits.hits).each(function (index, item) {
+				
+				var id = item._source.id;
+				
+				if (!byId[id]) {
+					byId[id] = [];
+				}
+				
+				byId[id].push(item._source);
+				
+				var date = new Date(item._source.timestamp*1000);
+				var hours = date.getHours();
+				var minutes = "0" + date.getMinutes();
+				var seconds = "0" + date.getSeconds();
+				var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+			});
+			
+			for (var id in byId) {
+				byId[id].sort(compare);
+			}
+			
+			console.log(byId);
+		}
+		
+		function refresh () {
+			$.ajax({
+				url: 'data.php?deltaMins=3600',
+				type: 'get',
+				success: function (data) {
+					currentData = $.parseJSON(data);
+					redrawChart();
+				}, error: function () {
+					
+				}
+			});
+		}
+		
 		$(function () {
-			var data = $.parseJSON($("#mockdata").html());
+			refresh();
 			
 			var ctx = document.getElementById("myChart");
 			var myChart = new Chart(ctx, {
