@@ -40,8 +40,6 @@
 			for (var id in byId) {
 				byId[id].sort(compare);
 			}
-			
-			console.log(byId);
 		}
 		
 		function refresh () {
