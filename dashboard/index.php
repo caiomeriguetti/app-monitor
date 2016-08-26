@@ -2,24 +2,32 @@
 	<head>
 		<title>Teste</title>
 		<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
+		<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script src="node_modules/chart.js/dist/Chart.min.js"></script>
 		<script src="colors.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="style.css">
+		
 	</head>
 	
 	<body>
-			<div class="row">
-				<div class="col-md-12">
-					
-				</div>
+		<div class="row">
+			<div class="col-md-12">
+				
 			</div>
-			
-			<div class="row">
-				<div class="col-md-12">
-					<canvas id="myChart" width="100%" height="100%"></canvas>
-				</div>
-			</div>
+		</div>
 		
+		<div class="row">
+			<div class="col-md-3">
+				<ul class="list-group" id="legends">
+				  
+				</ul>
+			</div>
+			<div class="col-md-9">
+				<canvas id="myChart" width="600" height="500"></canvas>
+			</div>
+		</div>
 		<script>
 			var currentData = null;
 			function compare(a,b) {
@@ -33,6 +41,7 @@
 			function redrawChart () {
 				var value, id;
 				var byId = {};
+				timePoints = [];
 				$(currentData.hits.hits).each(function (index, item) {
 
 					var id = item._source.id;
@@ -107,6 +116,7 @@
 				
 				var datasets = [];
 				var colorIndex = 0;
+				var legendColors = {}
 				
 				for (var idToRender in aggregationsById) {
 					var aggregations = aggregationsById[idToRender];
@@ -120,6 +130,8 @@
 						values.push(currentAggregation.average);
 					}
 					
+					legendColors[idToRender] = colors[colorIndex];
+					
 					datasets.push({
 			            label: idToRender,
 			            borderColor: "rgb"+colors[colorIndex]['rgb'],
@@ -131,12 +143,23 @@
 			        colorIndex ++;
 				}
 				
+				$("#legends").children().remove();
+				
+				for (var id in legendColors) {
+					var len = 20;
+					var st = id.length - len;
+					if (st < 0) st = 0; 
+					var lb = id.substr(st, id.length - 1);
+					$("#legends").append('<li class="list-group-item"><span class="badge" style="background-color:rgb'+legendColors[id]['rgb']+'">&nbsp</span>'+lb+'</li>');
+				}
+				
 				var ctx = document.getElementById("myChart");
 				var myChart = new Chart(ctx, {
 				    type: 'line',
 				    options: {
-				    	responsive: false,
-				    	maintainAspectRatio: false
+				    	responsive: true,
+				    	maintainAspectRatio: false,
+				    	legend: { display: false}
 				    },
 				    data: {
 				        labels: labels,
