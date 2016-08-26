@@ -3,12 +3,11 @@
 		<title>Teste</title>
 		<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 		<script src="node_modules/chart.js/dist/Chart.min.js"></script>
+		<script src="colors.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css">
 	</head>
 	
 	<body>
-		<div class="container">
-			
 			<div class="row">
 				<div class="col-md-12">
 					
@@ -17,11 +16,9 @@
 			
 			<div class="row">
 				<div class="col-md-12">
-					<canvas id="myChart" width="500" height="500" style="display: block; width: 500px; height: 500px;"></canvas>
+					<canvas id="myChart" width="100%" height="100%"></canvas>
 				</div>
 			</div>
-			
-		</div>
 		
 		<script>
 			var currentData = null;
@@ -32,7 +29,7 @@
 			    return 1;
 			  return 0;
 			}
-	
+			
 			function redrawChart () {
 				var value, id;
 				var byId = {};
@@ -109,6 +106,7 @@
 				}
 				
 				var datasets = [];
+				var colorIndex = 0;
 				
 				for (var idToRender in aggregationsById) {
 					var aggregations = aggregationsById[idToRender];
@@ -124,15 +122,22 @@
 					
 					datasets.push({
 			            label: idToRender,
-			            backgroundColor: "rgba(75,192,55,0.0)",
+			            borderColor: "rgb"+colors[colorIndex]['rgb'],
+			            backgroundColor: "rgba(0, 0, 0, 0)",
 			            lineTension: 0,
 			            data: values
 			        });
+			        
+			        colorIndex ++;
 				}
 				
 				var ctx = document.getElementById("myChart");
 				var myChart = new Chart(ctx, {
 				    type: 'line',
+				    options: {
+				    	responsive: false,
+				    	maintainAspectRatio: false
+				    },
 				    data: {
 				        labels: labels,
 				        datasets: datasets
