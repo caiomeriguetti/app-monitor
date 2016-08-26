@@ -13,7 +13,7 @@
 		<script>
 		$(function () {
 			var data = $.parseJSON($("#mockdata").html());
-			console.log(data);
+			
 			var ctx = document.getElementById("myChart");
 			var myChart = new Chart(ctx, {
 			    type: 'line',
