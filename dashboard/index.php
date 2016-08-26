@@ -7,79 +7,94 @@
 	</head>
 	
 	<body>
-		<canvas id="myChart" width="1000" height="1000" style="display: block; width: 1000px; height: 1000px;"></canvas>
-		<script>
-		var currentData = null;
-		function compare(a,b) {
-		  if (a.timestamp < b.timestamp)
-		    return -1;
-		  if (a.timestamp > b.timestamp)
-		    return 1;
-		  return 0;
-		}
-
-		function redrawChart () {
-			var value, id;
-			var byId = {};
-			$(currentData.hits.hits).each(function (index, item) {
-				
-				var id = item._source.id;
-				
-				if (!byId[id]) {
-					byId[id] = [];
-				}
-				
-				byId[id].push(item._source);
-				
-				var date = new Date(item._source.timestamp*1000);
-				var hours = date.getHours();
-				var minutes = "0" + date.getMinutes();
-				var seconds = "0" + date.getSeconds();
-				var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-			});
+		<div class="container">
 			
-			for (var id in byId) {
-				byId[id].sort(compare);
-			}
-		}
-		
-		function refresh () {
-			$.ajax({
-				url: 'data.php?deltaMins=3600',
-				type: 'get',
-				success: function (data) {
-					currentData = $.parseJSON(data);
-					redrawChart();
-				}, error: function () {
+			<div class="row">
+				<div class="col-md-12">
 					
-				}
-			});
-		}
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-12">
+					<canvas id="myChart" width="100%" height="100%" style="display: block; width: 100%; height: 100%;"></canvas>
+				</div>
+			</div>
+			
+		</div>
 		
-		$(function () {
-			refresh();
+		<script>
+			var currentData = null;
+			function compare(a,b) {
+			  if (a.timestamp < b.timestamp)
+			    return -1;
+			  if (a.timestamp > b.timestamp)
+			    return 1;
+			  return 0;
+			}
+	
+			function redrawChart () {
+				var value, id;
+				var byId = {};
+				$(currentData.hits.hits).each(function (index, item) {
+					
+					var id = item._source.id;
+					
+					if (!byId[id]) {
+						byId[id] = [];
+					}
+					
+					byId[id].push(item._source);
+					
+					var date = new Date(item._source.timestamp*1000);
+					var hours = date.getHours();
+					var minutes = "0" + date.getMinutes();
+					var seconds = "0" + date.getSeconds();
+					var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+				});
+				
+				for (var id in byId) {
+					byId[id].sort(compare);
+				}
+			}
 			
-			var ctx = document.getElementById("myChart");
-			var myChart = new Chart(ctx, {
-			    type: 'line',
-			    data: {
-			        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-			        datasets: [{
-			            label: 'Bisca1',
-			            borderColor: "rgba(75,192,55,1.0)",
-			            backgroundColor: "rgba(75,192,192,0.0)",
-			            data: [12, 19, 3, 5, 2, 3]
-			        }, {
-			            label: 'Bisca2',
-			            borderColor: "rgba(75,192,192,1.0)",
-			            backgroundColor: "rgba(75,192,192,0.0)",
-			            data: [5, 15, 1, 20, 6, 11]
-			        }]
-			    }
-			   
-			});
+			function refresh () {
+				$.ajax({
+					url: 'data.php?deltaMins=3600',
+					type: 'get',
+					success: function (data) {
+						currentData = $.parseJSON(data);
+						redrawChart();
+					}, error: function () {
+						
+					}
+				});
+			}
 			
-		})
+			$(function () {
+				refresh();
+				
+				var ctx = document.getElementById("myChart");
+				var myChart = new Chart(ctx, {
+				    type: 'line',
+				    data: {
+				        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+				        datasets: [{
+				            label: 'Bisca1',
+				            borderColor: "rgba(75,192,55,1.0)",
+				            backgroundColor: "rgba(75,192,192,0.0)",
+				            data: [12, 19, 3, 5, 2, 3]
+				        }, {
+				            label: 'Bisca2',
+				            borderColor: "rgba(75,192,192,1.0)",
+				            backgroundColor: "rgba(75,192,192,0.0)",
+				            data: [5, 15, 1, 20, 6, 11]
+				        }]
+				    }
+				   
+				});
+				
+			})
 		</script>
 
 	</body>
