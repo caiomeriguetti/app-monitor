@@ -17,7 +17,7 @@
 			
 			<div class="row">
 				<div class="col-md-12">
-					<canvas id="myChart" width="100%" height="100%" style="display: block; width: 100%; height: 100%;"></canvas>
+					<canvas id="myChart" width="500" height="500" style="display: block; width: 500px; height: 500px;"></canvas>
 				</div>
 			</div>
 			
@@ -37,7 +37,7 @@
 				var value, id;
 				var byId = {};
 				$(currentData.hits.hits).each(function (index, item) {
-					
+
 					var id = item._source.id;
 					
 					if (!byId[id]) {
@@ -53,9 +53,94 @@
 					var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 				});
 				
-				for (var id in byId) {
+				var id;
+				for (id in byId) {
 					byId[id].sort(compare);
 				}
+				
+				console.log(byId);
+				
+				var list, i, lenlist, starttime, first;
+				var aggregationsById = {}
+				for (id in byId) {
+					
+					list = byId[id];
+					lenlist = list.length;
+					first = list[0];
+					starttime = first.timestamp;
+					
+					var currentAggregation = {valueSum: first.value, nElements: 1, startTime: starttime, added: false};
+					var allAggregations = [];
+					var currentListElement = null;
+					
+					i = 1;
+					while (i < lenlist) {
+						
+						currentListElement = list[i];
+						
+						if (currentListElement.timestamp - starttime <= 30) {
+							currentAggregation.valueSum += currentListElement.value;
+							currentAggregation.nElements += 1;
+						} else {
+							
+							currentAggregation.average = currentAggregation.valueSum / currentAggregation.nElements;
+							allAggregations.push(currentAggregation);
+							currentAggregation.added = true;
+							
+							currentAggregation = {
+								valueSum: currentListElement.value,
+								nElements: 1,
+								startTime: starttime
+							};
+							starttime = currentListElement.timestamp;
+						}
+						
+						currentAggregation.endTime = currentListElement.timestamp;
+						
+						i++;
+					}
+					
+					if (currentAggregation.added === false) {
+						currentAggregation.average = currentAggregation.valueSum / currentAggregation.nElements;
+						allAggregations.push(currentAggregation);
+						currentAggregation.added = true;
+					}
+					
+					aggregationsById[id] = allAggregations;
+					
+				}
+				
+				var idToRender = 'picpay-webservice.api.getActivityStream';
+				var aggregations = aggregationsById[idToRender];
+				var labels = [];
+				var values = [];
+				var datasets = [];
+				var currentAggregation;
+				for (var i = 0; i < aggregations.length; i++) {
+					currentAggregation = aggregations[i]; 
+					labels.push(currentAggregation.startTime);
+					values.push(currentAggregation.average);
+					
+
+				}
+				
+				datasets.push({
+		            label: idToRender,
+		            borderColor: "rgba(75,192,55,1.0)",
+		            backgroundColor: null,
+		            lineTension: 0,
+		            data: values
+		       });
+				
+				var ctx = document.getElementById("myChart");
+				var myChart = new Chart(ctx, {
+				    type: 'line',
+				    data: {
+				        labels: labels,
+				        datasets: datasets
+				    }
+				   
+				});
 			}
 			
 			function refresh () {
@@ -73,26 +158,6 @@
 			
 			$(function () {
 				refresh();
-				
-				var ctx = document.getElementById("myChart");
-				var myChart = new Chart(ctx, {
-				    type: 'line',
-				    data: {
-				        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-				        datasets: [{
-				            label: 'Bisca1',
-				            borderColor: "rgba(75,192,55,1.0)",
-				            backgroundColor: "rgba(75,192,192,0.0)",
-				            data: [12, 19, 3, 5, 2, 3]
-				        }, {
-				            label: 'Bisca2',
-				            borderColor: "rgba(75,192,192,1.0)",
-				            backgroundColor: "rgba(75,192,192,0.0)",
-				            data: [5, 15, 1, 20, 6, 11]
-				        }]
-				    }
-				   
-				});
 				
 			})
 		</script>
