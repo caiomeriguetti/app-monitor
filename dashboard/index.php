@@ -58,8 +58,6 @@
 					byId[id].sort(compare);
 				}
 				
-				console.log(byId);
-				
 				var list, i, lenlist, starttime, first;
 				var aggregationsById = {}
 				for (id in byId) {
@@ -110,27 +108,27 @@
 					
 				}
 				
-				var idToRender = 'picpay-webservice.api.getActivityStream';
-				var aggregations = aggregationsById[idToRender];
-				var labels = [];
-				var values = [];
 				var datasets = [];
-				var currentAggregation;
-				for (var i = 0; i < aggregations.length; i++) {
-					currentAggregation = aggregations[i]; 
-					labels.push(currentAggregation.startTime);
-					values.push(currentAggregation.average);
-					
-
-				}
 				
-				datasets.push({
-		            label: idToRender,
-		            borderColor: "rgba(75,192,55,1.0)",
-		            backgroundColor: null,
-		            lineTension: 0,
-		            data: values
-		       });
+				for (var idToRender in aggregationsById) {
+					var aggregations = aggregationsById[idToRender];
+					var labels = [];
+					var values = [];
+					
+					var currentAggregation;
+					for (var i = 0; i < aggregations.length; i++) {
+						currentAggregation = aggregations[i];
+						labels.push(currentAggregation.startTime);
+						values.push(currentAggregation.average);
+					}
+					
+					datasets.push({
+			            label: idToRender,
+			            backgroundColor: "rgba(75,192,55,0.0)",
+			            lineTension: 0,
+			            data: values
+			        });
+				}
 				
 				var ctx = document.getElementById("myChart");
 				var myChart = new Chart(ctx, {

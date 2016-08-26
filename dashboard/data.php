@@ -23,6 +23,10 @@ $data = array('query' => array(
                 )
         )
 ));
+$data['size'] = 10000;
+$data['sort'] = [
+	['timestamp' => 'desc']
+];
 
 $url = "http://localhost:9200/$index/_search";
 
