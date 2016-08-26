@@ -134,8 +134,8 @@
 			        colorIndex ++;
 				}
 				
-				var ctx = document.getElementById("myChart");
-				var myChart = new Chart(ctx, {
+				var ctx = document.getElementById("myChart").getContext('2d');
+				var myChart = new Chart.Line(ctx, {
 				    type: 'line',
 				    options: {
 				    	animation: false,
@@ -149,6 +149,8 @@
 				    }
 				   
 				});
+				
+
 			}
 			
 			function refresh () {
@@ -166,6 +168,11 @@
 			
 			$(function () {
 				refresh();
+				
+				
+				setInterval(function () {
+					refresh();
+				}, 2000);
 				
 			})
 		</script>
