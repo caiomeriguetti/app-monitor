@@ -138,6 +138,7 @@
 				var myChart = new Chart(ctx, {
 				    type: 'line',
 				    options: {
+				    	animation: false,
 				    	responsive: true,
 				    	maintainAspectRatio: false,
 				    	legend: { display: false}
