@@ -12,20 +12,11 @@
 	</head>
 	
 	<body>
-		<div class="row">
-			<div class="col-md-12">
-				
-			</div>
-		</div>
-		
-		<div class="row">
-			<div class="col-md-3">
-				<ul class="list-group" id="legends">
-				  
-				</ul>
-			</div>
-			<div class="col-md-9">
-				<canvas id="myChart" width="600" height="500"></canvas>
+		<div class="container full">
+			<div class="row">
+				<div class="col-md-12">
+					<canvas id="myChart" width="600" height="500"></canvas>
+				</div>
 			</div>
 		</div>
 		<script>
@@ -141,16 +132,6 @@
 			        });
 			        
 			        colorIndex ++;
-				}
-				
-				$("#legends").children().remove();
-				
-				for (var id in legendColors) {
-					var len = 20;
-					var st = id.length - len;
-					if (st < 0) st = 0; 
-					var lb = id.substr(st, id.length - 1);
-					$("#legends").append('<li class="list-group-item"><span class="badge" style="background-color:rgb'+legendColors[id]['rgb']+'">&nbsp</span>'+lb+'</li>');
 				}
 				
 				var ctx = document.getElementById("myChart");
