@@ -32,7 +32,7 @@ $data = [
 ];
 
 if (!empty($signalId)) {
-	array_push($data['query']['bool']['filter'], ['term' => ['signalId' => 'picpay-webservice.api.getActivityStream']]);
+	array_push($data['query']['bool']['filter'], ['term' => ['signalId' => $signalId]]);
 }
 
 $data['size'] = 10000;

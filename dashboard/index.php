@@ -21,141 +21,133 @@
 		</div>
 		<script>
 			var currentData = null;
-			function compare(a,b) {
-			  if (a.timestamp < b.timestamp)
-			    return -1;
-			  if (a.timestamp > b.timestamp)
-			    return 1;
-			  return 0;
+			var myChart = null;
+			var intervalEndTimes = null;
+			var legendColors = {};
+
+			function compare(a, b) {
+				if (a.startTime > b.startTime) {
+					return 1;
+				} else if (a.startTime < b.startTime) {
+					return -1;
+				}
+
+				return 0;
 			}
-			
+
 			function redrawChart () {
 				var value, id;
 				var byId = {};
 				timePoints = [];
+
 				$(currentData.hits.hits).each(function (index, item) {
 
-					var id = item._source.id;
-					
+					var id = item._source.signalId;
+
 					if (!byId[id]) {
 						byId[id] = [];
 					}
 					
 					byId[id].push(item._source);
 				});
-				
-				var id;
-				for (id in byId) {
-					byId[id].sort(compare);
-				}
-				
-				var list, i, lenlist, starttime, first;
-				var aggregationsById = {}
-				for (id in byId) {
-					
-					list = byId[id];
-					lenlist = list.length;
-					first = list[0];
-					starttime = first.timestamp;
-					
-					var currentAggregation = {valueSum: first.value, nElements: 1, startTime: starttime, added: false};
-					var allAggregations = [];
-					var currentListElement = null;
-					
-					i = 1;
-					while (i < lenlist) {
-						
-						currentListElement = list[i];
-						
-						if (currentListElement.timestamp - starttime <= 30) {
-							currentAggregation.valueSum += currentListElement.value;
-							currentAggregation.nElements += 1;
-						} else {
-							
-							currentAggregation.average = currentAggregation.valueSum / currentAggregation.nElements;
-							allAggregations.push(currentAggregation);
-							currentAggregation.added = true;
-							
-							currentAggregation = {
-								valueSum: currentListElement.value,
-								nElements: 1,
-								startTime: starttime
-							};
-							starttime = currentListElement.timestamp;
-						}
-						
-						currentAggregation.endTime = currentListElement.timestamp;
-						
-						i++;
-					}
-					
-					if (currentAggregation.added === false) {
-						currentAggregation.average = currentAggregation.valueSum / currentAggregation.nElements;
-						allAggregations.push(currentAggregation);
-						currentAggregation.added = true;
-					}
-					
-					aggregationsById[id] = allAggregations;
-					
-				}
-				
+
 				var datasets = [];
 				var colorIndex = 0;
-				var legendColors = {};
 				
-				for (var idToRender in aggregationsById) {
-					var aggregations = aggregationsById[idToRender];
-					var labels = [];
-					var values = [];
+				var globalLabels = [];
+				var nowTime = (Math.floor(Date.now() / 1000));
+				nowTime = nowTime - (nowTime%30);
+
+				intervalTimes = [];
+				for (var i = 0; i < 10; i++) {
+					var time = nowTime - i*30;
+					intervalTimes.unshift(time);
+				}
+
+				for (var i = 0; i < intervalTimes.length; i++) {
+					var time = intervalTimes[i];
+					var date = new Date(time*1000);
+					var hours = date.getHours();
+					var minutes = "0" + date.getMinutes();
+					var seconds = "0" + date.getSeconds();
+					var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+					globalLabels.push(formattedTimebyId);
+				}
+
+				var labels = globalLabels;
+
+				for (var idToRender in byId) {
+
+					var aggregationsByLabel = {};
 					
+					for (var j = 0; j < intervalTimes.length; j++) {
+						var intervalTime = intervalTimes[j];
+						aggregationsByLabel[String(intervalTime)] = {"sum": 0, "nElements": 0};
+					}
+
+					var aggregations = byId[idToRender];
+
 					var currentAggregation;
 					for (var i = 0; i < aggregations.length; i++) {
 						currentAggregation = aggregations[i];
-						
-						var date = new Date(currentAggregation.startTime*1000);
-						var hours = date.getHours();
-						var minutes = "0" + date.getMinutes();
-						var seconds = "0" + date.getSeconds();
-						var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
-						labels.push(formattedTimebyId);
-						values.push(currentAggregation.average);
+
+						var aggTime = currentAggregation.timestamp - (currentAggregation.timestamp % 30);
+						var aggAverage = (currentAggregation.valueSum/currentAggregation.elementsNumber);
+
+						if (aggregationsByLabel[String(aggTime)]) {
+							aggregationsByLabel[String(aggTime)]["sum"] += aggAverage;
+							aggregationsByLabel[String(aggTime)]["nElements"] += 1;
+						}
 					}
 					
-					legendColors[idToRender] = colors[colorIndex];
+					var values = [];
+					for (var j = 0; j < intervalTimes.length; j++) {
+						var time = intervalTimes[j];
+						var timeStr = String(time);
+						values.push(aggregationsByLabel[timeStr]["sum"] / aggregationsByLabel[timeStr]["nElements"]);
+					}
+
+					if (!legendColors[idToRender]) {
+						legendColors[idToRender] = colors[colorIndex];
+						colorIndex ++;
+					}
 					
 					datasets.push({
-			            label: idToRender,
-			            borderColor: "rgb"+colors[colorIndex]['rgb'],
-			            backgroundColor: "rgba(0, 0, 0, 0)",
-			            lineTension: 0,
-			            data: values
-			        });
-			        
-			        colorIndex ++;
+            label: idToRender,
+            borderColor: "rgb"+legendColors[idToRender]['rgb'],
+            backgroundColor: "rgba(0, 0, 0, 0)",
+            lineTension: 0,
+            data: values
+	        });
+
 				}
 				
-				var ctx = document.getElementById("myChart").getContext('2d');
-				var myChart = new Chart.Line(ctx, {
-				    type: 'line',
-				    options: {
-				    	animation: false,
-				    	responsive: true,
-				    	maintainAspectRatio: false,
-				    	legend: { display: false}
-				    },
-				    data: {
-				        labels: labels,
-				        datasets: datasets
-				    }
-				   
-				});
+				if (myChart == null) {
+					var ctx = document.getElementById("myChart").getContext('2d');
+					myChart = new Chart.Line(ctx, {
+					    type: 'line',
+					    options: {
+					    	animation: false,
+					    	responsive: true,
+					    	maintainAspectRatio: false,
+					    	legend: { display: false}
+					    },
+					    data: {
+					        labels: labels,
+					        datasets: datasets
+					    }
+					});
+				} else {
+					myChart.data.datasets = datasets;
+					myChart.data.labels = labels;
+					myChart.update();
+				}
 				
-
 			}
 			
 			function refresh () {
 				$.ajax({
-					url: 'data.php?deltaMins=3600&signalId=picpay-webservice.api.getActivityStream',
+					url: 'data.php?deltaMins=120',
 					type: 'get',
 					success: function (data) {
 						currentData = $.parseJSON(data);
@@ -172,7 +164,7 @@
 				
 				setInterval(function () {
 					refresh();
-				}, 2000);
+				}, 5000);
 				
 			})
 		</script>
