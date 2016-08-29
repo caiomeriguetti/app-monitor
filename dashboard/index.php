@@ -10,23 +10,46 @@
 		<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="chosen_v1.6.2/chosen.css">
 		<link rel="stylesheet" type="text/css" href="style.css">
-
-		
 		
 	</head>
 	
 	<body>
 		<div class="container full">
 			<div class="row">
+				<div class="col-md-12">
+					<div class="row">
+					    <div class="input-group">
+					      <input type="text" class="form-control" placeholder="Search for...">
+					      <span class="input-group-btn">
+					        <button class="btn btn-default" type="button">Save Visualization</button>
+					      </span>
+					    </div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
 				<div class="col-md-4">
 					<div class="row">
 						<div class="col-md-12">
-							<select multiple id="signals-select" data-placeholder="Choose a signal" style="width:100%;" multiple class="chosen-select">
-								<option value="picpay-webservice.api.addConsumer">picpay-webservice.api.addConsumer</option>
-								<option value="picpay-webservice.api.getActivityStream">picpay-webservice.api.getActivityStream</option>
-							</select>
+							<br/>
+							<div class="input-group">
+						      <input id="signals-input" type="text" class="form-control" placeholder="Add a signal to visualize">
+						      <span class="input-group-btn">
+						        <button class="btn btn-default" type="button">+ Signal</button>
+						      </span>
+						    </div><!-- /input-group -->
 						</div>
 					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<br/>
+							<ul class="list-group" id="selectedSignals">
+							</ul>
+						</div>
+					</div>
+
+					
 
 					<div class="row">
 						<div class="col-md-12">
@@ -50,7 +73,8 @@
 			var currentData = null;
 			var myChart = null;
 			var intervalEndTimes = null;
-			
+			var selectedSignals = {};
+			var legendColors = {};
 
 			function compare(a, b) {
 				if (a.startTime > b.startTime) {
@@ -67,7 +91,7 @@
 				var byId = {};
 				timePoints = [];
 				var colorIndex = 0;
-				var legendColors = {};
+
 
 				$(currentData.hits.hits).each(function (index, item) {
 
@@ -78,12 +102,6 @@
 					}
 					
 					byId[id].push(item._source);
-
-					if (!legendColors[id]) {
-						legendColors[id] = colors[colorIndex];
-						colorIndex ++;
-					}
-					
 				});
 
 				var datasets = [];
@@ -181,8 +199,14 @@
 			}
 			
 			function refresh () {
+				var signals = [];
+				for (var signal in selectedSignals) {
+					if (selectedSignals[signal] === true) {
+						signals.push(signal);
+					}
+				}
 
-				if ($("#signals-select").val().length == 0) {
+				if (signals.length == 0) {
 					setTimeout(refresh, 2000);
 					return;
 				}
@@ -190,7 +214,7 @@
 				$.ajax({
 					url: 'data.php?deltaMins=120',
 					type: 'get',
-					data: {"signalId": $("#signals-select").val()},
+					data: {"signalId": signals},
 					success: function (data) {
 						currentData = $.parseJSON(data);
 						redrawChart();
@@ -200,13 +224,110 @@
 					}
 				});
 			}
-			
-			$(function () {
-				
-				$("#signals-select").chosen();
-				$("#interval").chosen();
-				$(".search-field input").on("keyup", function (e) {
 
+			function saveCurrentState () {
+				var state = {"selectedSignals": selectedSignals, "interval": $("#interval").val()};
+				localStorage.setItem("state", JSON.stringify(state));
+			}
+
+			function renderSelectedSignals () {
+				
+				$("#selectedSignals").children().remove();
+				var signals = [];
+				
+				colorIndex = 0;
+
+				for (var signal in selectedSignals) {
+					
+					legendColors[signal] = colors[colorIndex];
+					colorIndex ++;
+					var bgColor = legendColors[signal]['rgb'];
+					var signalElement = $('<li class="list-group-item">\
+							    <span class="badge" style="background:rgb'+bgColor+'">&nbsp;</span>\
+							    '+signal+'\
+							    <span style="float:left;padding-right: 10px" class="glyphicon glyphicon-remove" aria-hidden="true"></span>\
+							  </li>');
+					signalElement.data("signal", signal);
+
+					if (selectedSignals[signal] === false) {
+						signalElement.css("opacity", 0.5);
+					} else if (selectedSignals[signal] === true) {
+						signalElement.css("opacity", 1);
+					}
+
+					signalElement.on("click", ".glyphicon-remove", function (e) {
+						var signal = $(this).parents(".list-group-item").data("signal");
+						removeSignal(signal);
+						e.stopPropagation();
+						return false;
+					});
+
+					signalElement.on("click", ".badge", function (e) {
+						var signal = $(this).parents(".list-group-item").data("signal");
+						toggleSignal(signal);
+
+						e.stopPropagation();
+						return false;
+					});
+
+					
+
+					$("#selectedSignals").append(signalElement);
+				}
+
+			}
+
+			function toggleSignal (signal) {
+				if (selectedSignals[signal] === false) {
+					selectedSignals[signal] = true;
+				} else if (selectedSignals[signal] === true) {
+					selectedSignals[signal] = false;
+				}
+
+				saveCurrentState();
+				renderSelectedSignals();
+			}
+			
+			function disableSignal (signal) {
+				selectedSignals[signal] = false;
+				saveCurrentState();
+				renderSelectedSignals();
+			}
+
+			function removeSignal (signal) {
+				delete selectedSignals[signal];
+				saveCurrentState();
+				renderSelectedSignals();
+			}
+
+			function addSignal (signal) {
+				selectedSignals[signal] = true;
+				saveCurrentState();
+				renderSelectedSignals();
+			}
+
+			$(function () {
+				var savedState = localStorage.getItem("state");
+
+				if (savedState) {
+					var stateObject = $.parseJSON(savedState);
+					selectedSignals = stateObject.selectedSignals;
+					$("#interval").val(stateObject.interval);
+					renderSelectedSignals();
+				}
+				
+				$("#interval").change(function () {
+					saveCurrentState();
+				});
+
+				$("#interval").chosen();
+				$("#signals-input").on("keyup", function (e) {
+					if (e.keyCode == 13) {
+						var val = $("#signals-input").val();
+						addSignal(val);
+
+						return false;
+					}
 				});
 				refresh();
 				
