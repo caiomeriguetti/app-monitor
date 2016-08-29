@@ -104,7 +104,11 @@
 					for (var j = 0; j < intervalTimes.length; j++) {
 						var time = intervalTimes[j];
 						var timeStr = String(time);
-						values.push(aggregationsByLabel[timeStr]["sum"] / aggregationsByLabel[timeStr]["nElements"]);
+						var v = 0;
+						if (aggregationsByLabel[timeStr]["nElements"] > 0) {
+							v = aggregationsByLabel[timeStr]["sum"] / aggregationsByLabel[timeStr]["nElements"];
+						}
+						values.push(v);
 					}
 
 					if (!legendColors[idToRender]) {
@@ -130,7 +134,7 @@
 					    	animation: false,
 					    	responsive: true,
 					    	maintainAspectRatio: false,
-					    	legend: { display: false}
+					    	legend: { display: true }
 					    },
 					    data: {
 					        labels: labels,
