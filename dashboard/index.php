@@ -4,17 +4,27 @@
 		<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 		<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script src="node_modules/chart.js/dist/Chart.min.js"></script>
+		<script src="chosen_v1.6.2/chosen.jquery.min.js"></script>
 		<script src="colors.js"></script>
 		
 		<link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="chosen_v1.6.2/chosen.css">
 		<link rel="stylesheet" type="text/css" href="style.css">
+
+		
 		
 	</head>
 	
 	<body>
 		<div class="container full">
 			<div class="row">
-				<div class="col-md-12">
+				<div class="col-md-4">
+					<select multiple id="signals-select" data-placeholder="Choose a signal" style="width:350px;" multiple class="chosen-select">
+						<option value="picpay-webservice.api.addConsumer">picpay-webservice.api.addConsumer</option>
+						<option value="picpay-webservice.api.getActivityStream">picpay-webservice.api.getActivityStream</option>
+					</select>
+				</div>
+				<div class="col-md-8">
 					<canvas id="myChart" width="600" height="500"></canvas>
 				</div>
 			</div>
@@ -169,6 +179,9 @@
 				setInterval(function () {
 					refresh();
 				}, 5000);
+
+
+				$("#signals-select").chosen();
 				
 			})
 		</script>
