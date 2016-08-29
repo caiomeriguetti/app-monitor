@@ -30,6 +30,7 @@
 
 					<div class="row">
 						<div class="col-md-12">
+							<br/>
 							<select id="interval" data-placeholder="Choose an interval" style="width:100%;" class="chosen-select">
 								<option value="5">5 min</option>
 								<option value="10">10 min</option>
@@ -49,7 +50,7 @@
 			var currentData = null;
 			var myChart = null;
 			var intervalEndTimes = null;
-			var legendColors = {};
+			
 
 			function compare(a, b) {
 				if (a.startTime > b.startTime) {
@@ -65,6 +66,8 @@
 				var value, id;
 				var byId = {};
 				timePoints = [];
+				var colorIndex = 0;
+				var legendColors = {};
 
 				$(currentData.hits.hits).each(function (index, item) {
 
@@ -75,10 +78,16 @@
 					}
 					
 					byId[id].push(item._source);
+
+					if (!legendColors[id]) {
+						legendColors[id] = colors[colorIndex];
+						colorIndex ++;
+					}
+					
 				});
 
 				var datasets = [];
-				var colorIndex = 0;
+				
 				
 				var globalLabels = [];
 				var nowTime = (Math.floor(Date.now() / 1000));
@@ -137,19 +146,14 @@
 						}
 						values.push(v);
 					}
-
-					if (!legendColors[idToRender]) {
-						legendColors[idToRender] = colors[colorIndex];
-						colorIndex ++;
-					}
 					
 					datasets.push({
-            label: idToRender,
-            borderColor: "rgb"+legendColors[idToRender]['rgb'],
-            backgroundColor: "rgba(0, 0, 0, 0)",
-            lineTension: 0,
-            data: values
-	        });
+			            label: idToRender,
+			            borderColor: "rgb"+legendColors[idToRender]['rgb'],
+			            backgroundColor: "rgba(0, 0, 0, 0)",
+			            lineTension: 0,
+			            data: values
+			        });
 
 				}
 				
