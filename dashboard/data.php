@@ -32,8 +32,13 @@ $data = [
 ];
 
 if (!empty($signalId)) {
-	array_push($data['query']['bool']['filter'], ['term' => ['signalId' => $signalId]]);
+        $should = [];
+        foreach ($signalId as $key => $id) {
+                array_push($should, ['term' => ['signalId' => $id]]);
+        }
+        $data['query']['bool']['filter'][] = ['bool' => ['should' => $should]];
 }
+
 
 $data['size'] = 10000;
 $data['sort'] = [

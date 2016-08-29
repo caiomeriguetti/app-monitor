@@ -19,10 +19,26 @@
 		<div class="container full">
 			<div class="row">
 				<div class="col-md-4">
-					<select multiple id="signals-select" data-placeholder="Choose a signal" style="width:350px;" multiple class="chosen-select">
-						<option value="picpay-webservice.api.addConsumer">picpay-webservice.api.addConsumer</option>
-						<option value="picpay-webservice.api.getActivityStream">picpay-webservice.api.getActivityStream</option>
-					</select>
+					<div class="row">
+						<div class="col-md-12">
+							<select multiple id="signals-select" data-placeholder="Choose a signal" style="width:100%;" multiple class="chosen-select">
+								<option value="picpay-webservice.api.addConsumer">picpay-webservice.api.addConsumer</option>
+								<option value="picpay-webservice.api.getActivityStream">picpay-webservice.api.getActivityStream</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<select id="interval" data-placeholder="Choose an interval" style="width:100%;" class="chosen-select">
+								<option value="5">5 min</option>
+								<option value="10">10 min</option>
+								<option value="30">30 min</option>
+								<option value="60">1 h</option>
+								<option value="240">4 h</option>
+							</select>
+						</div>
+					</div>
 				</div>
 				<div class="col-md-8">
 					<canvas id="myChart" width="600" height="500"></canvas>
@@ -67,9 +83,10 @@
 				var globalLabels = [];
 				var nowTime = (Math.floor(Date.now() / 1000));
 				nowTime = nowTime - (nowTime%30);
-
+				var interval = $("#interval").val();
+				var intervals = parseInt(interval)*2;
 				intervalTimes = [];
-				for (var i = 0; i < 10; i++) {
+				for (var i = 0; i < intervals; i++) {
 					var time = nowTime - i*30;
 					intervalTimes.unshift(time);
 				}
@@ -144,7 +161,7 @@
 					    	animation: false,
 					    	responsive: true,
 					    	maintainAspectRatio: false,
-					    	legend: { display: true }
+					    	legend: { display: false }
 					    },
 					    data: {
 					        labels: labels,
@@ -160,12 +177,20 @@
 			}
 			
 			function refresh () {
+
+				if ($("#signals-select").val().length == 0) {
+					setTimeout(refresh, 2000);
+					return;
+				}
+
 				$.ajax({
 					url: 'data.php?deltaMins=120',
 					type: 'get',
+					data: {"signalId": $("#signals-select").val()},
 					success: function (data) {
 						currentData = $.parseJSON(data);
 						redrawChart();
+						setTimeout(refresh, 2000);
 					}, error: function () {
 						
 					}
@@ -173,15 +198,13 @@
 			}
 			
 			$(function () {
-				refresh();
 				
-				
-				setInterval(function () {
-					refresh();
-				}, 5000);
-
-
 				$("#signals-select").chosen();
+				$("#interval").chosen();
+				$(".search-field input").on("keyup", function (e) {
+
+				});
+				refresh();
 				
 			})
 		</script>
