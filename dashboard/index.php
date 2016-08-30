@@ -17,14 +17,14 @@
 		<div class="container full">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="row">
-					    <div class="input-group">
-					      <input type="text" class="form-control" placeholder="Search for...">
-					      <span class="input-group-btn">
-					        <button class="btn btn-default" type="button">Save Visualization</button>
-					      </span>
-					    </div>
-					</div>
+					<br/>
+				    <div class="input-group">
+				      <input type="text" class="form-control" placeholder="New visualization">
+				      <span class="input-group-btn">
+				        <button class="btn btn-success" type="button">Save Visualization</button>
+				      </span>
+				    </div>
+				    <br/>
 				</div>
 			</div>
 			<div class="row">
@@ -35,7 +35,7 @@
 							<div class="input-group">
 						      <input id="signals-input" type="text" class="form-control" placeholder="Add a signal to visualize">
 						      <span class="input-group-btn">
-						        <button class="btn btn-default" type="button" id="add-signal-bt">+ Signal</button>
+						        <button class="btn btn-primary" type="button" id="add-signal-bt">+ Signal</button>
 						      </span>
 						    </div><!-- /input-group -->
 						</div>
@@ -323,7 +323,7 @@
 					addSignal(val);
 				});
 
-				$("#interval").chosen();
+				$("#interval").chosen({width: "100%"});
 				$("#signals-input").on("keyup", function (e) {
 					if (e.keyCode == 13) {
 						var val = $("#signals-input").val();
