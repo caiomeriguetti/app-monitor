@@ -32,9 +32,17 @@
 
 					<div class="row">
 						<div class="col-md-12">
-							<br/>
-							<select id="open-visualization" data-placeholder="Open visualization" style="width:100%;" class="chosen-select">
-							</select>
+							<div class="row">
+								<div class="col-md-10">
+									<br/>
+									<select id="open-visualization" data-placeholder="Open visualization" style="width:100%;" class="chosen-select">
+									</select>
+								</div>
+								<div class="col-md-2">
+									<br/>
+									<button id="bt-del" class="btn btn-danger" type="button" id="add-signal-bt"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></button>
+								</div>
+							</div>
 						</div>
 					</div>
 
@@ -84,6 +92,7 @@
 			var intervalEndTimes = null;
 			var selectedSignals = {};
 			var legendColors = {};
+			var openedVisualization = null;
 
 			function compare(a, b) {
 				if (a.startTime > b.startTime) {
@@ -379,14 +388,49 @@
 			}
 
 			function loadVisualization (data) {
+				openedVisualization = data;
 				selectedSignals = data.selectedSignals;
 				$("#interval").val(data.interval);
+				$("#interval").trigger("chosen:updated");
 				$("#name").val(data.name);
 				if (data.selectedVisualization) {
 					$("#open-visualization").val(data.selectedVisualization);
 				}
 				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
+			}
+
+			function clear () {
+				var clearedState = {
+					"selectedSignals": [], 
+					"interval": "", 
+					"name": "",
+					"selectedVisualization": null
+				};
+
+				openedVisualization = null;
+				localStorage.setItem("state", clearedState);
+				$("#interval").val("");
+				$("#name").val("");
+
+				renderSelectedSignals();
+				loadVisualization(clearedState);
+			}
+
+			function delCurrentVisualization () {
+				if (openedVisualization) {
+					$.ajax({
+						url: "del.php",
+						data: {name: openedVisualization.name},
+						type: 'post',
+						success: function () {
+							syncVisualizations();
+							clear();
+						},error: function () {
+
+						}
+					});
+				}
 			}
 
 
@@ -397,6 +441,10 @@
 					var stateObject = $.parseJSON(savedState);
 					loadVisualization(stateObject);
 				}
+
+				$("#bt-del").click(function () {
+					delCurrentVisualization();
+				})
 				
 				$("#name").change(function () {
 					saveCurrentStateOnLocalStorage();
