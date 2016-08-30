@@ -19,7 +19,7 @@ def writeSignal(type, id):
 	port = 6868;
 
 	try :
-		randomValue = random.random()
+		randomValue = 2 + random.random()
 		timestamp = time.time()
 
 		msg = """{"signalId": "%s", "type": "%s", "value": %s, "timestamp": %s}"""%(id, type, randomValue, timestamp)
