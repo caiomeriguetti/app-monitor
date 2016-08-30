@@ -19,9 +19,9 @@
 				<div class="col-md-12">
 					<br/>
 				    <div class="input-group">
-				      <input type="text" class="form-control" placeholder="New visualization">
+				      <input type="text" class="form-control" placeholder="New visualization" id="name">
 				      <span class="input-group-btn">
-				        <button class="btn btn-success" type="button">Save Visualization</button>
+				        <button class="btn btn-success" type="button" id="save-bt">Save Visualization</button>
 				      </span>
 				    </div>
 				    <br/>
@@ -29,6 +29,15 @@
 			</div>
 			<div class="row">
 				<div class="col-md-4">
+
+					<div class="row">
+						<div class="col-md-12">
+							<br/>
+							<select id="open-visualization" data-placeholder="Open visualization" style="width:100%;" class="chosen-select">
+							</select>
+						</div>
+					</div>
+
 					<div class="row">
 						<div class="col-md-12">
 							<br/>
@@ -225,8 +234,39 @@
 				});
 			}
 
-			function saveCurrentState () {
-				var state = {"selectedSignals": selectedSignals, "interval": $("#interval").val()};
+			function getCurrentState () {
+				var state = {
+					"selectedSignals": selectedSignals, 
+					"interval": $("#interval").val(), 
+					"name": $("#name").val(),
+					"selectedVisualization": $("#open-visualization").val()
+				};
+				return state;
+			}
+
+			function saveVisualization () {
+				var state = getCurrentState();
+
+				if (state['name'] === '') {
+					alert("Name cannot be empty");
+					return false;
+				}
+
+				$.ajax({
+					url: "save.php",
+					data: {"visualization-data": JSON.stringify(state)},
+					type: "post",
+					success: function () {
+						alert("Saved");
+						syncVisualizations();
+					}, error: function () {
+						alert("Error");
+					}
+				});
+			}
+
+			function saveCurrentStateOnLocalStorage () {
+				var state = getCurrentState();
 				localStorage.setItem("state", JSON.stringify(state));
 			}
 
@@ -282,40 +322,88 @@
 					selectedSignals[signal] = false;
 				}
 
-				saveCurrentState();
+				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
 			
 			function disableSignal (signal) {
 				selectedSignals[signal] = false;
-				saveCurrentState();
+				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
 
 			function removeSignal (signal) {
 				delete selectedSignals[signal];
-				saveCurrentState();
+				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
 
 			function addSignal (signal) {
 				selectedSignals[signal] = true;
-				saveCurrentState();
+				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
+
+			function syncVisualizations () {
+
+				var currentState = getCurrentState();
+				$.ajax({
+					url: "visualizations.php",
+					type: "get",
+					success: function (r) {
+						var data = $.parseJSON(r);
+						
+						$("#open-visualization").children().remove();
+
+						var first = $("<option> </option>");
+						$("#open-visualization").append(first);
+
+						$(data).each(function (index, item) {
+							var newOption = $("<option> </option>");
+							newOption.val(item.name);
+							newOption.html(item.name);
+							newOption.data("visualization", item);
+							$("#open-visualization").append(newOption);
+						});
+
+						if (currentState.selectedVisualization) {
+							$("#open-visualization").val(currentState.selectedVisualization);
+						}
+
+						$("#open-visualization").trigger("chosen:updated");
+
+					}, error: function () {
+
+					}
+				});
+			}
+
+			function loadVisualization (data) {
+				selectedSignals = data.selectedSignals;
+				$("#interval").val(data.interval);
+				$("#name").val(data.name);
+				if (data.selectedVisualization) {
+					$("#open-visualization").val(data.selectedVisualization);
+				}
+				saveCurrentStateOnLocalStorage();
+				renderSelectedSignals();
+			}
+
 
 			$(function () {
 				var savedState = localStorage.getItem("state");
 
 				if (savedState) {
 					var stateObject = $.parseJSON(savedState);
-					selectedSignals = stateObject.selectedSignals;
-					$("#interval").val(stateObject.interval);
-					renderSelectedSignals();
+					loadVisualization(stateObject);
 				}
 				
+				$("#name").change(function () {
+					saveCurrentStateOnLocalStorage();
+				})
+
 				$("#interval").change(function () {
-					saveCurrentState();
+					saveCurrentStateOnLocalStorage();
 				});
 
 				$("#add-signal-bt").on("click", function () {
@@ -323,7 +411,7 @@
 					addSignal(val);
 				});
 
-				$("#interval").chosen({width: "100%"});
+				$("#interval, #open-visualization").chosen({width: "100%"});
 				$("#signals-input").on("keyup", function (e) {
 					if (e.keyCode == 13) {
 						var val = $("#signals-input").val();
@@ -332,7 +420,18 @@
 						return false;
 					}
 				});
+
+				$("#save-bt").on("click", function () {
+					saveVisualization();
+				});
+
+				$("#open-visualization").chosen().change(function () {
+					var visualizationData = $("#open-visualization option:selected").data("visualization");
+					loadVisualization(visualizationData);
+				});
+
 				refresh();
+				syncVisualizations();
 				
 			})
 		</script>

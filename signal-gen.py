@@ -19,11 +19,8 @@ def writeSignal(type, id):
 	port = 6868;
 
 	try :
-		randomValue = random.random()*10
+		randomValue = random.random()
 		timestamp = time.time()
-
-		if id == "picpay-webservice.api.getActivityStream":
-			randomValue += 5
 
 		msg = """{"signalId": "%s", "type": "%s", "value": %s, "timestamp": %s}"""%(id, type, randomValue, timestamp)
 		s.sendto(msg, (host, port))
