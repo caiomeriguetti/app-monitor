@@ -35,7 +35,7 @@
 							<div class="input-group">
 						      <input id="signals-input" type="text" class="form-control" placeholder="Add a signal to visualize">
 						      <span class="input-group-btn">
-						        <button class="btn btn-default" type="button">+ Signal</button>
+						        <button class="btn btn-default" type="button" id="add-signal-bt">+ Signal</button>
 						      </span>
 						    </div><!-- /input-group -->
 						</div>
@@ -270,8 +270,6 @@
 						return false;
 					});
 
-					
-
 					$("#selectedSignals").append(signalElement);
 				}
 
@@ -318,6 +316,11 @@
 				
 				$("#interval").change(function () {
 					saveCurrentState();
+				});
+
+				$("#add-signal-bt").on("click", function () {
+					var val = $("#signals-input").val();
+					addSignal(val);
 				});
 
 				$("#interval").chosen();
