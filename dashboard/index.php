@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Teste</title>
+		<title>Signals View</title>
 		<script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
 		<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 		<script src="node_modules/chart.js/dist/Chart.min.js"></script>
