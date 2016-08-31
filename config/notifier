@@ -1,0 +1,6 @@
+{
+	"SLACK_NOTIFICATION_USERNAME": "Username",
+	"SLACK_NOTIFICATION_ICON_EMOJI": ":warning:",
+	"SLACK_NOTIFICATION_CHANNEL": "#notification-channel-name",
+	"SLACK_NOTIFICATION_ENDPOINT": "https://hooks.slack.com/services/XXXXXX"
+}

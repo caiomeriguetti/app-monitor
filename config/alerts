@@ -1,0 +1,6 @@
+{
+	"signal.name.example":[
+		{"id": "signal-averagetime-gte5-for2mins", "gte": 5, "for": 2},
+		{"id": "signal-averagetime-lte1-for2mins", "lte": 1, "for": 2}
+	]
+}
