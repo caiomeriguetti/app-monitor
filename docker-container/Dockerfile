@@ -15,12 +15,8 @@ RUN mkdir -p /var/log/app-monitor/ && mkdir -p /var/app-monitor-data
 RUN apt-get install -y --force-yes python-requests
 RUN apt-get install -y --force-yes git
 RUN apt-get install -y --force-yes php5-curl
-RUN currentDir=$(pwd)
-RUN cd /var && git clone https://github.com/caiomeriguetti/app-monitor.git ;
-RUN cd $currentDir
 RUN apt-get install -y --force-yes redis-server
 RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py
 RUN pip install redis
-RUN pip install slacker
 EXPOSE 81 9200 10000
-ENTRYPOINT currentDir=$(pwd); cd /var/app-monitor; git fetch --all; cp /var/app-monitor/apache2/dashboard.conf /etc/apache2/sites-available/dashboard.conf; a2ensite dashboard.conf; git checkout origin/master -f; cp /var/app-monitor/supervisor.conf /etc/supervisor/conf.d/app-monitor.conf; cd $currentDir; service apache2 start; service redis-server start; service supervisor start; cd elasticsearch-2.3.4/bin && ./elasticsearch -Dpath.data=/var/app-monitor-data -Des.insecure.allow.root=true -Dnetwork.bind_host="0.0.0.0" > /tmp/elasticout
+ENTRYPOINT cd elasticsearch-2.3.4/bin && ./elasticsearch -Dpath.data=/var/app-monitor-data -Des.insecure.allow.root=true -Dnetwork.bind_host="0.0.0.0" > /tmp/elasticout
