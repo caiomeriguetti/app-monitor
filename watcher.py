@@ -18,6 +18,11 @@ alerts = {
 alertStates = {}
 
 while True:
+	
+	now = datetime.datetime.now()
+
+    indexName = 'signals-' + str(now.year) + "-" + str(now.month)
+
 	try :
 		signalsToWatch = alerts.keys()
 
@@ -60,7 +65,7 @@ while True:
 			{'timestamp': 'desc'}
 		]
 
-		response = requests.post('http://localhost:9200/time-spent/_search', data=json.dumps(data))
+		response = requests.post('http://localhost:9200/%s/_search'%(indexName,), data=json.dumps(data))
 
 		try:
 			responseData = json.loads(response.text)

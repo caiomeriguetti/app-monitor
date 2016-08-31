@@ -10,7 +10,7 @@ function get($arr, $key, $default) {
 }
 
 $minutesToMonitor = intval(get($_GET, 'deltaMins', 60));
-$index = get($_GET, 'index', 'time-spent');
+$index = "signals-" . date("Y") . '-' . intVal(date("m"));
 $signalId = get($_GET, 'signalId', null);
 
 $currentTime = time();
