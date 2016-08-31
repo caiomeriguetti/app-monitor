@@ -9,7 +9,7 @@ import redis
 alertStates = {}
 
 dataDir = "/var/app-monitor-data/"
-watcherDataDir = dataDir + "watcher/"
+watcherDataDir = dataDir + "config/"
 
 if not(os.path.isdir(watcherDataDir)):
     os.mkdir(watcherDataDir)
