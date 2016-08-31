@@ -4,11 +4,13 @@ import requests
 import sys
 import time
 
-try:
-    config = json.loads(open('/var/app-monitor-data/config/notifier', "r+").read())
-except Exception, e:
-    print "Problem load configuration", str(e)
-    sys.exit(0)
+while True:
+    try:
+        config = json.loads(open('/var/app-monitor-data/config/notifier', "r+").read())
+        break
+    except Exception, e:
+        print "Problem loading configuration", str(e)
+        time.sleep(3)
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 maxElementsToProccessAtOnce = 100
