@@ -17,8 +17,12 @@ if not(os.path.isdir(watcherDataDir)):
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 while True:
-
-    alerts = json.loads(open(watcherDataDir + 'alerts', "r+").read())
+    try:
+        alerts = json.loads(open(watcherDataDir + 'alerts', "r+").read())
+    except Exceptio, e:
+        print "Couldnt load alerts", str(e)
+        time.sleep(1)
+        continue
 
     now = datetime.datetime.now()
 

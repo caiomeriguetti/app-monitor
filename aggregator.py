@@ -15,7 +15,12 @@ while True:
 
     indexName = 'signals-' + str(now.year) + "-" + str(now.month)
 
-    response = requests.get('http://localhost:9200/' + indexName)
+    try:
+        response = requests.get('http://localhost:9200/' + indexName)
+    except:
+        print "Couldnt check if the index", indexName, "exists"
+        time.sleep(1)
+        continue
     
     if response.status_code == 404:
         mappings = {

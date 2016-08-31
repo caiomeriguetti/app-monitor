@@ -2,6 +2,7 @@ import redis
 import json
 import requests
 import sys
+import time
 
 try:
     config = json.loads(open('/var/app-monitor-data/config/notifier', "r+").read())
@@ -51,8 +52,6 @@ while True:
             'channel': config["SLACK_NOTIFICATION_CHANNEL"]
         }
         
-        jsonPayload = "payload=" + json.dumps(payload)
-        
-        requests.post(config["SLACK_NOTIFICATION_ENDPOINT"], data=jsonPayload)
+        requests.post(config["SLACK_NOTIFICATION_ENDPOINT"], data={'payload': json.dumps(payload)})
 
     time.sleep(1)

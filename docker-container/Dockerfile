@@ -18,7 +18,7 @@ RUN apt-get install -y --force-yes php5-curl
 RUN currentDir=$(pwd)
 RUN cd /var && git clone https://github.com/caiomeriguetti/app-monitor.git ;
 RUN cp /var/app-monitor/apache2/dashboard.conf /etc/apache2/sites-available/dashboard.conf; a2ensite dashboard.conf
-RUN cp /var/app-monitor/udp-server.supervisor.conf /etc/supervisor/conf.d/app-monitor.conf
+RUN cp /var/app-monitor/supervisor.conf /etc/supervisor/conf.d/app-monitor.conf
 RUN cd $currentDir
 RUN apt-get install -y --force-yes redis-server
 RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py
