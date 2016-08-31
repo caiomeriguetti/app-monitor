@@ -33,7 +33,7 @@ def writeSignal(type, id):
 ids = [
 	["picpay-webservice.api.addConsumer", 10, 'rand'], 
 	["picpay-webservice.api.getActivityStream", 5, 'rand'], 
-	#["picpay-backend.core.ConsumerShell.processConsumerRecentInteractions", 1, 'const']
+#	["picpay-backend.core.ConsumerShell.processConsumerRecentInteractions", 1, 'const']
 ]
 
 while True:

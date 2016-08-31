@@ -89,6 +89,4 @@ while True:
                         response = requests.post('http://localhost:9200/%s/log/'%(indexName,), data=json.dumps(byIdAggregation[id][tsStr]))
                         del byIdAggregation[id][tsStr]
 
-    
-
     time.sleep(1)
