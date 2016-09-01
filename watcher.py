@@ -101,7 +101,7 @@ while True:
 
                 numTimePointsEvaluated = 0
                 numTimePointsMatched = 0
-                alertId = alert['id']
+                alertId = alertSignalId + alert['id']
 
                 if not(alertId in alertStates.keys()):
                     alertStates[alertId] = None
