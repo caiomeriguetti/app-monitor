@@ -70,15 +70,14 @@ while True:
             {'timestamp': 'desc'}
         ]
 
-        response = requests.post('http://localhost:9200/%s/_search'%(indexName,), data=json.dumps(data))
-
         try:
+            response = requests.post('http://localhost:9200/%s/_search'%(indexName,), data=json.dumps(data))
             responseData = json.loads(response.text)
-        except:
+        except Exceptio, e:
 
-            print "Couldnt get response from elasticsearch"
-
+            print "Couldnt get response from elasticsearch", str(e)
             time.sleep(1)
+            
             continue
 
         for aggregation in responseData['hits']['hits']:

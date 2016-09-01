@@ -16,11 +16,16 @@ print >>sys.stderr, 'starting up on %s port %s' % server_address
 sock.bind(server_address)
 
 def handle(jsonStr):
-	r.rpush("app-monitor-queue", jsonStr)
+    r.rpush("app-monitor-queue", jsonStr)
 
 while True:
     print >>sys.stderr, '\nwaiting to receive message'
-    jsonStr, address = sock.recvfrom(1024)
-    Thread(target=handle, args=(jsonStr,)).start()
+
+    try:
+        jsonStr, address = sock.recvfrom(1024)
+        Thread(target=handle, args=(jsonStr,)).start()
+    except:
+        print "Error recieving message"
+
     print >>sys.stderr, 'received %s bytes from %s' % (len(jsonStr), address)
     print >>sys.stderr, jsonStr

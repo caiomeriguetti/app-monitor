@@ -12,7 +12,14 @@ while True:
         print "Problem loading configuration", str(e)
         time.sleep(3)
 
-r = redis.StrictRedis(host='localhost', port=6379, db=0)
+while True:
+    try:
+        r = redis.StrictRedis(host='localhost', port=6379, db=0)
+    except:
+        print "Error connecting to redis"
+        time.sleep(3)
+
+
 maxElementsToProccessAtOnce = 100
 
 while True:
@@ -33,6 +40,7 @@ while True:
 
     if poppeds == 0:
         time.sleep(1)
+        continue
 
     for element in elementsToProcess:
         try:
@@ -54,13 +62,16 @@ while True:
         except:
             message = "Alert %s(%s) changed state from %s to %s." % (signalId, alertData['id'], statusFrom, statusTo)
         
-        payload = {
-            'text': message,
-            'username': config["SLACK_NOTIFICATION_USERNAME"],
-            'icon_emoji': config["SLACK_NOTIFICATION_ICON_EMOJI"],
-            'channel': config["SLACK_NOTIFICATION_CHANNEL"]
-        }
-        
-        requests.post(config["SLACK_NOTIFICATION_ENDPOINT"], data={'payload': json.dumps(payload)})
+        try:
+            payload = {
+                'text': message,
+                'username': config["SLACK_NOTIFICATION_USERNAME"],
+                'icon_emoji': config["SLACK_NOTIFICATION_ICON_EMOJI"],
+                'channel': config["SLACK_NOTIFICATION_CHANNEL"]
+            }
+            
+            requests.post(config["SLACK_NOTIFICATION_ENDPOINT"], data={'payload': json.dumps(payload)})
+        except Exception, e:
+            print "Error sending notification to Slack ", str(e)
 
     time.sleep(1)
