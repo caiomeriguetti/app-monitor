@@ -1,5 +1,5 @@
 <?php
 
 $CONFIG = [
-	'data-dir' => '/var/app-monitor-data/dashboard/'
+    'data-dir' => '/var/app-monitor-data/dashboard/'
 ];

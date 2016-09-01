@@ -1,12 +1,12 @@
 <?php
 
 function get($arr, $key, $default) {
-	
-	if (!isset($arr[$key])) {
-		return $default;
-	}
-	
-	return $arr[$key];
+    
+    if (!isset($arr[$key])) {
+        return $default;
+    }
+    
+    return $arr[$key];
 }
 
 $minutesToMonitor = intval(get($_GET, 'deltaMins', 60));
@@ -17,18 +17,18 @@ $currentTime = time();
 $delta = $minutesToMonitor*60;
 
 $data = [
-	'query' => [
-		'bool' => [
-			'filter' => [
-		        ['range' => [
-	                'timestamp' => [
-	                    'gte' => $currentTime - $delta,
-	                    'lte' => $currentTime
-	                ]
-		        ]],
-	        ]
-		]
-	]
+    'query' => [
+        'bool' => [
+            'filter' => [
+                ['range' => [
+                    'timestamp' => [
+                        'gte' => $currentTime - $delta,
+                        'lte' => $currentTime
+                    ]
+                ]],
+            ]
+        ]
+    ]
 ];
 
 if (!empty($signalId)) {
@@ -42,7 +42,7 @@ if (!empty($signalId)) {
 
 $data['size'] = 10000;
 $data['sort'] = [
-	['timestamp' => 'desc']
+    ['timestamp' => 'desc']
 ];
 
 $data = json_encode($data);
