@@ -44,8 +44,15 @@ while True:
         alert = notificationData['alertData']
         statusFrom = notificationData['statusFrom']
         statusTo = notificationData['statusTo']
+        signalId = notificationData['signalId']
 
-        message = """ Alert %s changed state: %s -> %s""" % (alert['id'], statusFrom, statusTo)
+        try:
+            if statusTo == "MATCH_ALERT_CRITERIA":
+                message = """ Alert %s: %s""" % (signalId, alert['match_text'])
+            elif statusTo == "OK":
+                message = """ Alert %s: %s""" % (signalId, alert['notmatch_text'])
+        except:
+            message = "Alert %s(%s) changed state from %s to %s." % (signalId, alertData['id'], statusFrom, statusTo)
         
         payload = {
             'text': message,

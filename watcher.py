@@ -170,7 +170,7 @@ while True:
                     
                     print 'Alert state changed', alertId, alertStates[alertId]
                     
-                    notificationData = {'alertData': alert, 'statusFrom': statusFrom, 'statusTo': alertStates[alertId]}
+                    notificationData = {'alertData': alert, 'statusFrom': statusFrom, 'statusTo': alertStates[alertId], 'signalId': alertSignalId}
                     r.rpush("app-monitor-notification", json.dumps(notificationData))
 
                 elif numTimePointsEvaluated != numTimePointsMatched and alertStates[alertId] != 'OK':
@@ -179,7 +179,7 @@ while True:
 
                     print 'Alert state changed', alertId, alertStates[alertId]
 
-                    notificationData = {'alertData': alert, 'statusFrom': statusFrom, 'statusTo': alertStates[alertId]}
+                    notificationData = {'alertData': alert, 'statusFrom': statusFrom, 'statusTo': alertStates[alertId], 'signalId': alertSignalId}
                     r.rpush("app-monitor-notification", json.dumps(notificationData))
 
         time.sleep(1)
