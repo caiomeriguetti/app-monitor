@@ -61,7 +61,7 @@
 					<div class="row">
 						<div class="col-md-12">
 							<br/>
-							<ul class="list-group" id="selectedSignals">
+							<ul class="list-group" id="signalsSelect">
 							</ul>
 						</div>
 					</div>
@@ -90,7 +90,7 @@
 			var currentData = null;
 			var myChart = null;
 			var intervalEndTimes = null;
-			var selectedSignals = {};
+			var selectedSignals = new Object();
 			var legendColors = {};
 			var openedVisualization = null;
 
@@ -281,7 +281,7 @@
 
 			function renderSelectedSignals () {
 				
-				$("#selectedSignals").children().remove();
+				$("#signalsSelect").children().remove();
 				var signals = [];
 				
 				colorIndex = 0;
@@ -319,7 +319,7 @@
 						return false;
 					});
 
-					$("#selectedSignals").append(signalElement);
+					$("#signalsSelect").append(signalElement);
 				}
 
 			}
@@ -402,14 +402,14 @@
 
 			function clear () {
 				var clearedState = {
-					"selectedSignals": [], 
+					"selectedSignals": {}, 
 					"interval": "", 
 					"name": "",
 					"selectedVisualization": null
 				};
 
 				openedVisualization = null;
-				localStorage.setItem("state", clearedState);
+				localStorage.setItem("state", JSON.stringify(clearedState));
 				$("#interval").val("");
 				$("#name").val("");
 
