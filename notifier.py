@@ -15,6 +15,7 @@ while True:
 while True:
     try:
         r = redis.StrictRedis(host='localhost', port=6379, db=0)
+        break
     except:
         print "Error connecting to redis"
         time.sleep(3)
