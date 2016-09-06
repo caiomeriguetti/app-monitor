@@ -274,11 +274,6 @@
 				});
 			}
 
-			function saveCurrentStateOnLocalStorage () {
-				var state = getCurrentState();
-				localStorage.setItem("state", JSON.stringify(state));
-			}
-
 			function renderSelectedSignals () {
 				
 				$("#signalsSelect").children().remove();
@@ -331,25 +326,21 @@
 					selectedSignals[signal] = false;
 				}
 
-				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
 			
 			function disableSignal (signal) {
 				selectedSignals[signal] = false;
-				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
 
 			function removeSignal (signal) {
 				delete selectedSignals[signal];
-				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
 
 			function addSignal (signal) {
 				selectedSignals[signal] = true;
-				saveCurrentStateOnLocalStorage();
 				renderSelectedSignals();
 			}
 
@@ -396,7 +387,7 @@
 				if (data.selectedVisualization) {
 					$("#open-visualization").val(data.selectedVisualization);
 				}
-				saveCurrentStateOnLocalStorage();
+
 				renderSelectedSignals();
 			}
 
@@ -409,7 +400,7 @@
 				};
 
 				openedVisualization = null;
-				localStorage.setItem("state", JSON.stringify(clearedState));
+				
 				$("#interval").val("");
 				$("#name").val("");
 
@@ -435,12 +426,6 @@
 
 
 			$(function () {
-				var savedState = localStorage.getItem("state");
-
-				if (savedState) {
-					var stateObject = $.parseJSON(savedState);
-					loadVisualization(stateObject);
-				}
 
 				$("#bt-del").click(function () {
 					delCurrentVisualization();
