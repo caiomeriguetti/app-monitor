@@ -77,6 +77,9 @@
 								<option value="30">30 min</option>
 								<option value="60">1 h</option>
 								<option value="240">4 h</option>
+								<option value="480">8 h</option>
+								<option value="1440">1 d</option>
+								<option value="2880">2 d</option>
 							</select>
 						</div>
 					</div>
@@ -229,8 +232,10 @@
 					return;
 				}
 
+				var interval = $("#interval").val();
+
 				$.ajax({
-					url: 'data.php?deltaMins=120',
+					url: 'data.php?deltaMins=' + interval,
 					type: 'get',
 					data: {"signalId": signals},
 					success: function (data) {
