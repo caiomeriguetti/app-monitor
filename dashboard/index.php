@@ -80,6 +80,8 @@
 								<option value="480">8 h</option>
 								<option value="1440">1 d</option>
 								<option value="2880">2 d</option>
+								<option value="7200">5 d</option>
+								<option value="14400">10 d</option>
 							</select>
 						</div>
 					</div>
@@ -87,12 +89,28 @@
 					<div class="row">
 						<div class="col-md-12">
 							<br/>
-							<select id="aggregation-type" data-placeholder="Choose an interval" style="width:100%;" class="chosen-select">
+							<select id="aggregation-type" data-placeholder="Aggregation type" style="width:100%;" class="chosen-select">
 								<option value="average" selected>Average</option>
 								<option value="count">Count</option>
 							</select>
 						</div>
 					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<br/>
+							<select id="aggregation-interval" data-placeholder="Aggregation interval" style="width:100%;" class="chosen-select">
+								<option value="30" selected>30s</option>
+								<option value="60">1min</option>
+								<option value="600">10min</option>
+								<option value="3600">1h</option>
+								<option value="14400">4h</option>
+								<option value="86400">1d</option>
+								<option value="259200">3d</option>
+							</select>
+						</div>
+					</div>
+
 				</div>
 				<div class="col-md-8">
 					<canvas id="myChart" width="600" height="500"></canvas>
@@ -119,6 +137,7 @@
 
 			function redrawChart () {
 				var aggType = $("#aggregation-type").val();
+				var aggInterval = parseInt($("#aggregation-interval").val());
 				var value, id;
 				var byId = {};
 				timePoints = [];
@@ -140,12 +159,12 @@
 				
 				var globalLabels = [];
 				var nowTime = (Math.floor(Date.now() / 1000));
-				nowTime = nowTime - (nowTime%30);
-				var interval = $("#interval").val();
-				var intervals = parseInt(interval)*2;
+				nowTime = nowTime - (nowTime%aggInterval);
+				var interval = parseInt($("#interval").val());
+				var intervals = parseInt((interval*60)/aggInterval);
 				intervalTimes = [];
 				for (var i = 0; i < intervals; i++) {
-					var time = nowTime - i*30;
+					var time = nowTime - i*aggInterval;
 					intervalTimes.unshift(time);
 				}
 
@@ -155,7 +174,13 @@
 					var hours = date.getHours();
 					var minutes = "0" + date.getMinutes();
 					var seconds = "0" + date.getSeconds();
-					var formattedTimebyId = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+					// var day = date.getDay()+1;
+					// var month = date.getMonth()+1;
+					var mm = date.getMonth() + 1; // getMonth() is zero-based
+					var dd = date.getDate();
+
+					var yyyymmdd = [date.getFullYear(), !mm[1] && '0', mm, !dd[1] && '0', dd].join('');
+					var formattedTimebyId = yyyymmdd + '-'+hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
 					globalLabels.push(formattedTimebyId);
 				}
 
@@ -176,7 +201,7 @@
 					for (var i = 0; i < aggregations.length; i++) {
 						currentAggregation = aggregations[i];
 
-						var aggTime = currentAggregation.timestamp - (currentAggregation.timestamp % 30);
+						var aggTime = currentAggregation.timestamp - (currentAggregation.timestamp % aggInterval);
 						var aggAverage = (currentAggregation.valueSum/currentAggregation.elementsNumber);
 
 						if (aggregationsByLabel[String(aggTime)]) {
