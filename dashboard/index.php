@@ -83,6 +83,16 @@
 							</select>
 						</div>
 					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<br/>
+							<select id="aggregation-type" data-placeholder="Choose an interval" style="width:100%;" class="chosen-select">
+								<option value="average" selected>Average</option>
+								<option value="count">Count</option>
+							</select>
+						</div>
+					</div>
 				</div>
 				<div class="col-md-8">
 					<canvas id="myChart" width="600" height="500"></canvas>
@@ -108,11 +118,11 @@
 			}
 
 			function redrawChart () {
+				var aggType = $("#aggregation-type").val();
 				var value, id;
 				var byId = {};
 				timePoints = [];
 				var colorIndex = 0;
-
 
 				$(currentData.hits.hits).each(function (index, item) {
 
@@ -181,7 +191,16 @@
 						var timeStr = String(time);
 						var v = 0;
 						if (aggregationsByLabel[timeStr]["nElements"] > 0) {
-							v = aggregationsByLabel[timeStr]["sum"] / aggregationsByLabel[timeStr]["nElements"];
+							switch (aggType) {
+								case "count":
+									v = aggregationsByLabel[timeStr]["nElements"];
+								break;
+
+								default:
+									v = aggregationsByLabel[timeStr]["sum"] / aggregationsByLabel[timeStr]["nElements"];
+								break;
+							}
+							
 						}
 						values.push(v);
 					}
