@@ -15,8 +15,16 @@ server_address = ('0.0.0.0', 10000)
 print >>sys.stderr, 'starting up on %s port %s' % server_address
 sock.bind(server_address)
 
+queue_id = 0
+max_queue = 3
+
 def handle(jsonStr):
-    r.rpush("app-monitor-queue", jsonStr)
+    global queue_id
+    global max_queue
+
+    r.rpush("app-monitor-queue" + str(queue_id + 1), jsonStr)
+    queue_id += 1
+    queue_id = queue_id % max_queue
 
 while True:
     print >>sys.stderr, '\nwaiting to receive message'

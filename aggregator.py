@@ -3,11 +3,20 @@ import time
 import requests
 import json
 import datetime
+from threading import Thread
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 maxElementsToProccessAtOnce = 10000
 
+queue_id = int(r.incr('app-monitor-aggregator-queueid')) % 3
+queue_id += 1
+
+print "Starting aggregator for queue", queue_id
+
 byIdAggregation = {}
+
+def send_to_elastic(index, data):
+    response = requests.post('http://localhost:9200/%s/log/'%(index,), data=json.dumps(data))
 
 while True:
 
@@ -47,7 +56,7 @@ while True:
 
     while poppeds < maxElementsToProccessAtOnce and stopPopping == False:
 
-        queuedElement = r.lpop("app-monitor-queue")
+        queuedElement = r.lpop("app-monitor-queue" + str(queue_id))
 
         if queuedElement:
             elementsToProcess.append(queuedElement)
@@ -57,6 +66,9 @@ while True:
 
     if poppeds == 0:
         time.sleep(1)
+        continue
+
+    print "Poped ", poppeds
 
     for element in elementsToProcess:
 
@@ -90,8 +102,9 @@ while True:
                 for tsStr in byIdAggregation[id].keys():
                     if time.time() - byIdAggregation[id][tsStr]["timestamp"] >= 30:
                         #send to elastic
-                        print "Sending to elasticsearch", id, byIdAggregation[id][tsStr]
-                        response = requests.post('http://localhost:9200/%s/log/'%(indexName,), data=json.dumps(byIdAggregation[id][tsStr]))
+                        data = byIdAggregation[id][tsStr]
+                        print "Sending to elasticsearch", id, data
+                        send_to_elastic(indexName, data)
                         del byIdAggregation[id][tsStr]
 
-    time.sleep(1)
+    print "Finish processing ", poppeds
