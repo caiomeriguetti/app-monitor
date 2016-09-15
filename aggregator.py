@@ -5,7 +5,7 @@ import json
 import datetime
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
-maxElementsToProccessAtOnce = 10000
+maxElementsToProccessAtOnce = 100000
 
 byIdAggregation = {}
 
