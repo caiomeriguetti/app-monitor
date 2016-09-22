@@ -18,13 +18,23 @@ sock.bind(server_address)
 queue_id = 0
 max_queue = 3
 
+signal_to_queue = {};
+
 def handle(jsonStr):
     global queue_id
     global max_queue
+    data = json.loads(jsonStr)
+    sid = data['signalId']
 
-    r.rpush("app-monitor-queue" + str(queue_id + 1), jsonStr)
-    queue_id += 1
-    queue_id = queue_id % max_queue
+    if sid in signal_to_queue.keys():
+        qid = signal_to_queue[sid]
+    else:
+        qid = str(queue_id + 1)
+        signal_to_queue[sid] = qid
+        queue_id += 1
+        queue_id = queue_id % max_queue
+    
+    r.rpush("app-monitor-queue" + qid, jsonStr)
 
 while True:
     print >>sys.stderr, '\nwaiting to receive message'
