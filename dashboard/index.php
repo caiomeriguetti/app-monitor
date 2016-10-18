@@ -1,3 +1,6 @@
+<?php
+include "secured.php";
+?>
 <html>
 	<head>
 		<title>Signals View</title>
