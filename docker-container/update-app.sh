@@ -15,4 +15,9 @@ service apache2 restart
 cp /var/app-monitor/supervisor.conf /etc/supervisor/conf.d/app-monitor.conf
 service supervisor restart
 
+if [ -f "/var/app-monitor-data/bootstrap.sh" ]
+then
+    . /var/app-monitor-data/bootstrap.sh
+fi
+
 cd /elasticsearch-2.3.4/bin && ./elasticsearch -Dpath.data=/var/app-monitor-data -Des.insecure.allow.root=true -Dnetwork.bind_host="0.0.0.0" > /tmp/elasticout

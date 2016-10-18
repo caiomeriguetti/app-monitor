@@ -18,6 +18,7 @@ RUN apt-get install -y --force-yes php5-curl
 RUN apt-get install -y --force-yes redis-server
 RUN wget https://bootstrap.pypa.io/get-pip.py && python get-pip.py
 RUN pip install redis
+RUN pip install awscli --ignore-installed six
 COPY update-app.sh /update-app.sh
 EXPOSE 81 9200 10000
 ENTRYPOINT . /update-app.sh; tailf /dev/null
